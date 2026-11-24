@@ -83,6 +83,14 @@
   textarea { resize: vertical; min-height: 96px; }
   input:focus, select:focus, textarea:focus { border-color: var(--ink); }
   input[type="date"], input[type="time"] { min-height: 40px; }
+  .tf { display: flex; align-items: center; gap: 6px; }
+  .tf select { width: auto; min-width: 64px; }
+  .tf.empty select { color: var(--sub); }
+  .tf-ap { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; flex: none; }
+  .tf-ap span { padding: 9px 10px; font-size: 13px; color: var(--sub); }
+  .tf-ap span.on { background: var(--ink); color: var(--inkfg); font-weight: 700; }
+  .tf-ap:disabled { opacity: .45; }
+  .tf-c { color: var(--sub); }
   .hidden { display: none !important; }
   .sub { color: var(--sub); }
   .txtbtn { color: var(--sub); font-size: 13px; padding: 4px 6px; border-radius: 6px; white-space: nowrap; }
@@ -99,7 +107,7 @@
 
   /* =========================================================
      레이아웃
-     모바일: 하단 5탭(보관함 = 아이디어 → 폴더 → 진행바 세로 흐름) / PC(1200px↑): 아이디어 저장소 | 폴더 | 진행바 | 캘린더(메인)
+     모바일: 하단 5탭(보관함 = 아이디어 → 폴더 → 진행바 세로 흐름) / PC(1200px↑): 아이디어 저장소(항상) | [달력 화면에서만: 폴더 | 진행바] | 메인
      ========================================================= */
   #shell { min-height: 100dvh; display: block; padding-bottom: 64px; }
   #top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between;
@@ -126,8 +134,10 @@
 
   @media (min-width: 1200px) {
     #shell { height: 100dvh; min-height: 0; padding-bottom: 0; display: grid;
-      grid-template-columns: 190px 190px 220px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);
-      grid-template-areas: "top top top top" "side fside pside main"; }
+      grid-template-columns: 220px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);
+      grid-template-areas: "top top" "side main"; }
+    #shell[data-eff="plan"] { grid-template-columns: 220px 180px 210px minmax(0, 1fr); grid-template-areas: "top top top top" "side fside pside main"; }
+    #shell:not([data-eff="plan"]) #fside, #shell:not([data-eff="plan"]) #pside { display: none !important; }
     #top { grid-area: top; position: relative; }
     #top #nav { position: absolute; left: 50%; transform: translateX(-50%); top: 0; bottom: 0; right: auto; border: 0; background: none; padding: 0; }
     #nav button { padding: 0 18px; display: grid; place-items: center; flex: none; font-size: 14px; }
@@ -140,8 +150,8 @@
     #shell[data-eff="plan"] #addEv { display: inline-block; }
     #fab { display: none !important; }
   }
-  @media (min-width: 1400px) { #shell { grid-template-columns: 230px 230px 260px minmax(0, 1fr); } }
-  @media (min-width: 1700px) { #shell { grid-template-columns: 280px 280px 310px minmax(0, 1fr); } }
+  @media (min-width: 1400px) { #shell { grid-template-columns: 250px minmax(0, 1fr); } #shell[data-eff="plan"] { grid-template-columns: 250px 220px 250px minmax(0, 1fr); } }
+  @media (min-width: 1700px) { #shell { grid-template-columns: 290px minmax(0, 1fr); } #shell[data-eff="plan"] { grid-template-columns: 290px 280px 310px minmax(0, 1fr); } }
   @media (max-width: 1199px) { /* 모바일: 아이디어 저장소 → 폴더 → 진행바 로 이어지는 세로 흐름 */
     #fside, #pside { border-top: 1px solid var(--line); margin-top: 6px; }
     #dumpList { max-height: 46dvh; overflow: auto; }
@@ -188,6 +198,8 @@
   /* 폴더 트리 */
   .frow { display: flex; align-items: center; gap: 2px; padding: 6px 2px; border-radius: 8px; position: relative; }
   .frow:hover { background: var(--hover); }
+  .frow.top { background: color-mix(in srgb, var(--ink) 8%, transparent); margin-top: 6px; } /* 상위 폴더 = 투명한 회색 바 */
+  .frow.top:hover { background: color-mix(in srgb, var(--ink) 13%, transparent); }
   .frow[draggable="true"] { cursor: grab; }
   .frow.drop-before::before, .frow.drop-after::after { content: ""; position: absolute; left: 0; right: 0; height: 2px; background: var(--ink); }
   .frow.drop-before::before { top: -1px; } .frow.drop-after::after { bottom: -1px; }
@@ -199,6 +211,9 @@
   .arch-row .nm { flex: 1; min-width: 0; word-break: break-word; }
 
   /* 진행바 탭 */
+  .pitem, .routine { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .pitem input { -webkit-user-select: text; user-select: text; }
+  .sorting { position: relative; z-index: 30; background: var(--surface); box-shadow: 0 6px 20px rgba(0,0,0,.2); border-radius: 10px; transition: none !important; }
   .pitem { padding: 10px 2px; border-bottom: 1px solid var(--line); }
   .pl1 { display: flex; align-items: center; gap: 6px; }
   .pdot { width: 8px; height: 8px; border-radius: 50%; background: var(--r); flex: none; }
@@ -288,6 +303,7 @@
   .ucell .rchk { width: 10px; height: 10px; font-size: 7px; }
   .gut { position: relative; font-size: 9px; color: var(--sub); }
   .gut span { position: absolute; right: 3px; transform: translateY(-50%); }
+  .gut span.f { transform: translateY(2px); } .gut span.l { transform: translateY(calc(-100% - 2px)); }
   .dcol { position: relative; border-left: 1px solid var(--line); background-image: linear-gradient(to bottom, var(--line) 1px, transparent 1px); cursor: pointer; min-width: 0; }
   .dcol.today { background-color: color-mix(in srgb, var(--hover) 70%, transparent); }
   .blk { position: absolute; border-radius: 4px; padding: 1px 2px 1px 3px; overflow: hidden; font-size: 9px; line-height: 1.15; cursor: pointer; word-break: break-all;
@@ -328,6 +344,19 @@
 
   /* 루틴 */
   .catbar { display: flex; gap: 6px; overflow-x: auto; padding: 12px 0 4px; align-items: center; }
+  .rcols { display: block; }
+  #mealBox { margin-top: 26px; padding-top: 4px; border-top: 1px solid var(--line); }
+  @media (min-width: 1200px) { .rcols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; } #mealBox { margin-top: 0; border-top: 0; border-left: 1px solid var(--line); padding: 0 0 0 24px; } }
+  .mealform { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .mealform input { flex: 1; min-width: 140px; }
+  .slotbtn { min-width: 64px; padding: 9px 12px; border: 1px solid var(--ink); border-radius: 8px; text-align: center; font-weight: 700; background: var(--ink); color: var(--inkfg); }
+  #mSnack.on { background: var(--ink); color: var(--inkfg); border-color: var(--ink); }
+  .msec { margin-top: 14px; }
+  .mrow { display: flex; gap: 8px; align-items: baseline; width: 100%; padding: 8px 4px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .mrow:hover { background: var(--hover); }
+  .mrow .mt { flex: 1; min-width: 0; word-break: break-word; }
+  .mrow.snack { padding-left: 18px; color: var(--sub); }
+  .mtag { font-size: 11px; border: 1px solid var(--line); border-radius: 6px; padding: 0 5px; color: var(--sub); flex: none; }
   .rsec { margin-top: 6px; }
   .routine { padding: 10px 4px; border-bottom: 1px solid var(--line); }
   .rhead { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; align-items: start; }
@@ -495,10 +524,25 @@
     </section>
 
     <section id="routine">
-      <div class="catbar" id="catBar"></div>
-      <div id="routineNote"></div>
-      <div id="routineList"></div>
-      <div style="margin-top:14px"><button class="btn ghost" id="addRoutine">+ 루틴 추가</button></div>
+      <div class="rcols">
+        <div id="rmain">
+          <div class="catbar" id="catBar"></div>
+          <div id="routineNote"></div>
+          <div id="routineList"></div>
+          <div style="margin-top:14px"><button class="btn ghost" id="addRoutine">+ 루틴 추가</button></div>
+        </div>
+        <div id="mealBox">
+          <div class="sec-h first"><span>식단 기록</span><span id="mealDate"></span></div>
+          <div class="mealform">
+            <button class="slotbtn" id="mSlot" type="button" aria-label="시간대 바꾸기"></button>
+            <button class="chip" id="mSnack" type="button">간식</button>
+            <input id="mInput" type="text" autocomplete="off" enterkeyhint="done" placeholder="먹은 것 (예: 계란, 토스트)">
+            <button class="btn small" id="mAdd" type="button">추가</button>
+          </div>
+          <div class="hint">시간대 버튼을 누를 때마다 아침 → 점심 → 저녁으로 바뀌어요. ‘간식’을 켜고 추가하면 고른 시간대의 식사 아래에 붙어요.</div>
+          <div id="mealList"></div>
+        </div>
+      </div>
     </section>
 
     <section id="journal">
@@ -692,7 +736,7 @@ function openHolMenu() {
    상태
    ========================================================= */
 const S = {
-  uid: null, tasks: [], folders: [], routines: [], cats: [], quotes: [], diary: new Map(), logs: new Map(), days: new Map(),
+  uid: null, tasks: [], folders: [], routines: [], cats: [], quotes: [], meals: [], mSlot: null, mSnack: false, diary: new Map(), logs: new Map(), days: new Map(),
   tab: "plan", view: "month", date: todayStr(),
   open: new Set(JSON.parse(LS.get("openFolders", "[]"))),
   openTrack: new Set(), showArch: false,
@@ -771,7 +815,7 @@ $("#logoutBtn").onclick = () => signOut(auth);
 onAuthStateChanged(auth, (user) => {
   unsubs.forEach((u) => u()); unsubs = [];
   if (!user) {
-    S.uid = null; S.tasks = []; S.folders = []; S.routines = []; S.cats = []; S.quotes = [];
+    S.uid = null; S.tasks = []; S.folders = []; S.routines = []; S.cats = []; S.quotes = []; S.meals = [];
     $("#shell").classList.add("hidden"); $("#login").classList.remove("hidden"); return;
   }
   S.uid = user.uid;
@@ -785,7 +829,7 @@ function listen() {
   const since = addDays(todayStr(), -90);
   const watch = (name, key) => unsubs.push(onSnapshot(col(name), (s) => { S[key] = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll(); }));
   watch("tasks", "tasks"); watch("folders", "folders"); watch("routines", "routines");
-  watch("routineCats", "cats"); watch("quotes", "quotes");
+  watch("routineCats", "cats"); watch("quotes", "quotes"); watch("meals", "meals");
   unsubs.push(onSnapshot(col("days"), (s) => { S.days = new Map(s.docs.map((d) => [d.id, d.data()])); renderAll(); }));
   unsubs.push(onSnapshot(col("diary"), (s) => { S.diary = new Map(s.docs.map((d) => [d.id, d.data()])); renderAll(); }));
   unsubs.push(onSnapshot(query(col("routineLogs"), where("date", ">=", since)), (s) => {
@@ -806,7 +850,8 @@ function renderAll() {
     const e = effTab(), sh = $("#shell");
     sh.dataset.tab = S.tab; sh.dataset.eff = e;
     document.querySelectorAll("#nav button").forEach((b) => b.classList.toggle("on", b.dataset.tab === e));
-    if (mqDesk.matches || S.tab === "dump") { renderSide(); renderFolders(); renderProg(); }
+    if (mqDesk.matches || S.tab === "dump") renderSide();
+    if ((mqDesk.matches && e === "plan") || S.tab === "dump") { renderFolders(); renderProg(); }
     renderDaybar();
     if (e === "plan") renderPlan();
     else if (e === "routine") renderRoutine();
@@ -948,7 +993,7 @@ dumpInput.addEventListener("keydown", (e) => {
 function renderSide() {
   // 날짜도 폴더도 없는 것 = 아이디어. (폴더가 없어진 옛 데이터도 여기로 돌아옴)
   const dump = S.tasks.filter((t) => !t.date && !activeId(t.folderId) && !(t.folderId && folderById(t.folderId)) && showInLists(t))
-    .sort((a, b) => (a.done - b.done) || (a.createdAt - b.createdAt));
+    .sort((a, b) => (a.done - b.done) || (b.createdAt - a.createdAt)); // 최신 등록이 맨 위
   $("#dumpCount").textContent = dump.filter((t) => !t.done).length || "";
   const dl = $("#dumpList"); dl.textContent = "";
   if (!dump.length) dl.append(h("div", { class: "empty" }, "비어 있어요. 위 입력창에 마음껏 쏟아내세요."));
@@ -959,6 +1004,88 @@ dh.addEventListener("dragover", (e) => { if (S.dragKind === "task") { e.preventD
 dh.addEventListener("dragleave", () => dh.classList.remove("over"));
 dh.addEventListener("drop", (e) => { e.preventDefault(); dh.classList.remove("over"); if (S.dragKind === "task") moveTask(S.dragId, null); S.dragId = null; S.dragKind = null; });
 const moveTask = (id, folderId) => { if (id) updateTask(id, { folderId: folderId || null }); };
+
+/* =========================================================
+   꾹 눌러서(터치) / 끌어서(마우스) 순서 바꾸기 — 루틴, 진행바 공용
+   ========================================================= */
+const SORT = { active: false };
+document.addEventListener("touchmove", (e) => { if (SORT.active) e.preventDefault(); }, { passive: false });
+function makeSortable(box, itemSel, commit) {
+  let st = null, suppress = false;
+  const reset = () => {
+    if (!st) return;
+    clearTimeout(st.timer);
+    if (st.active) st.items.forEach((el) => { el.style.transform = ""; el.style.transition = ""; el.classList.remove("sorting"); });
+    SORT.active = false; st = null;
+  };
+  const activate = () => {
+    if (!st || st.active) return;
+    st.items = [...box.querySelectorAll(itemSel)]; st.from = st.items.indexOf(st.el);
+    if (st.from < 0 || st.items.length < 2) { reset(); return; }
+    st.rects = st.items.map((el) => el.getBoundingClientRect());
+    const n = st.items.length, r = st.rects;
+    st.step = st.from < n - 1 ? r[st.from + 1].top - r[st.from].top : r[st.from].top - r[st.from - 1].top;
+    st.active = true; st.to = st.from; SORT.active = true;
+    st.items.forEach((el) => { if (el !== st.el) el.style.transition = "transform .12s"; });
+    st.el.classList.add("sorting");
+    try { st.el.setPointerCapture(st.pid); } catch {}
+    vibrate(20);
+  };
+  box.addEventListener("pointerdown", (e) => {
+    if (e.button > 0 || st) return;
+    const el = e.target.closest(itemSel); if (!el || !box.contains(el)) return;
+    if (e.target.closest("input, select, textarea")) return;
+    st = { el, sx: e.clientX, sy: e.clientY, pid: e.pointerId, active: false, mouse: e.pointerType === "mouse" };
+    if (!st.mouse) st.timer = setTimeout(activate, 380); // 터치: 꾹 누르면 시작
+  });
+  box.addEventListener("pointermove", (e) => {
+    if (!st || e.pointerId !== st.pid) return;
+    const dx = e.clientX - st.sx, dy = e.clientY - st.sy;
+    if (!st.active) {
+      if (st.mouse && Math.hypot(dx, dy) > 5) activate();            // 마우스: 5px 이상 끌면 시작
+      else if (!st.mouse && Math.hypot(dx, dy) > 9) reset();         // 터치: 꾹 누르기 전에 움직이면 일반 스크롤
+      if (!st || !st.active) return;
+    }
+    e.preventDefault();
+    const { from, rects, items } = st, mid = rects[from].top + rects[from].height / 2 + dy;
+    st.el.style.transform = `translateY(${dy}px)`;
+    let to = from;
+    items.forEach((_, i) => {
+      if (i === from) return; const m = rects[i].top + rects[i].height / 2;
+      if (i > from && mid > m) to = Math.max(to, i);
+      if (i < from && mid < m) to = Math.min(to, i);
+    });
+    st.to = to;
+    items.forEach((el, i) => {
+      if (i === from) return;
+      const sh = to > from && i > from && i <= to ? -st.step : to < from && i < from && i >= to ? st.step : 0;
+      el.style.transform = sh ? `translateY(${sh}px)` : "";
+    });
+  });
+  const end = (e, cancel) => {
+    if (!st || e.pointerId !== st.pid) return;
+    if (st.active) {
+      suppress = true; setTimeout(() => { suppress = false; }, 80);
+      if (!cancel && st.to !== st.from) {
+        const ids = st.items.map((el) => el.dataset.id); const [m] = ids.splice(st.from, 1); ids.splice(st.to, 0, m);
+        commit(ids);
+      }
+    }
+    reset();
+  };
+  box.addEventListener("pointerup", (e) => end(e, false));
+  box.addEventListener("pointercancel", (e) => end(e, true));
+  box.addEventListener("click", (e) => { if (suppress) { e.stopPropagation(); e.preventDefault(); } }, true);
+  box.addEventListener("contextmenu", (e) => { if (st) e.preventDefault(); });
+}
+// 순서값(타임스탬프 등)을 새 순서대로 다시 나눠 줌 — 보이지 않는 항목의 상대 순서는 그대로 유지
+function reorderKeys(colName, field, objs, newIds, keyOf) {
+  const keys = objs.map(keyOf).sort((a, b) => a - b);
+  for (let i = 1; i < keys.length; i++) if (keys[i] <= keys[i - 1]) keys[i] = keys[i - 1] + 1;
+  const b = writeBatch(db); let n = 0;
+  newIds.forEach((id, i) => { const o = objs.find((x) => x.id === id); if (o && keyOf(o) !== keys[i]) { b.update(dref(colName, id), { [field]: keys[i] }); n++; } });
+  if (n) b.commit();
+}
 
 /* =========================================================
    3단: 진행바 — 빨간 태그(부담도 3 = 길게) 일정 모음. 퍼센트를 직접 조절
@@ -986,20 +1113,27 @@ function progItem(t) {
     h("div", { class: "pl1" }, h("i", { class: "pdot" }), h("button", { class: "ptitle", type: "button", onclick: () => openTaskEditor(t) }, t.title), meta ? h("span", { class: "pmeta" }, meta) : null),
     h("div", { class: "pl2" }, bar, h("label", { class: "pnum" }, num, "%")));
 }
+let progBoxInit = false;
 function renderProg() {
   const all = S.tasks.filter((t) => t.effort === 3 && !isRep(t));
-  const open = all.filter((t) => !t.done).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  const pkey = (t) => t.porder ?? t.createdAt ?? 0;
+  const open = all.filter((t) => !t.done).sort((a, b) => pkey(a) - pkey(b));
   const done = all.filter((t) => t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
   const avg = open.length ? Math.round(open.reduce((n, t) => n + progOf(t), 0) / open.length) : 0;
   $("#pCount").textContent = open.length ? `${open.length}개 · 평균 ${avg}%` : "";
   const box = $("#pList"); box.textContent = "";
   if (!open.length) box.append(h("div", { class: "empty" }, "아직 없어요. 위에 적거나, 일정의 부담도를 ‘길게(빨강)’로 지정하면 여기에 모여요."));
   open.forEach((t) => box.append(progItem(t)));
+  if (open.length > 1) box.append(h("div", { class: "hint", style: "margin:8px 2px" }, "항목을 꾹 눌러서(PC는 끌어서) 순서를 바꿀 수 있어요"));
   if (done.length) {
     box.append(h("button", { class: "ptoggle", type: "button", onclick: () => { S.progDone = !S.progDone; renderAll(); } }, `완료한 일 ${done.length}개 ${S.progDone ? "▾" : "▸"}`));
     if (S.progDone) done.forEach((t) => box.append(progItem(t)));
   }
 }
+makeSortable($("#pList"), ".pitem:not(.done)", (ids) => {
+  const open = S.tasks.filter((t) => t.effort === 3 && !isRep(t) && !t.done);
+  reorderKeys("tasks", "porder", open, ids, (t) => t.porder ?? t.createdAt ?? 0);
+});
 $("#pInput").addEventListener("keydown", (e) => {
   if (e.key !== "Enter" || e.isComposing || !S.uid) return;
   const q = parseQuick(e.target.value, false); if (!q.title) return;
@@ -1017,7 +1151,7 @@ function renderFolders() {
   const countDeep = (fid) => tasksOf(fid).filter((t) => !t.done).length + kidsOf(fid).reduce((n, c) => n + countDeep(c.id), 0);
   const node = (f, depth, idx, total) => {
     const open = S.open.has(f.id);
-    const row = h("div", { class: "frow", style: `padding-left:${2 + depth * 14}px`, draggable: "true" },
+    const row = h("div", { class: "frow" + (depth === 0 ? " top" : ""), style: `padding-left:${2 + depth * 14}px`, draggable: "true" },
       h("button", { class: "caret", type: "button", onclick: () => toggleOpen(f.id) }, open ? "▾" : "▸"),
       h("button", { class: "fname", type: "button", onclick: () => toggleOpen(f.id) }, f.name),
       S.reorder ? h("button", { class: "txtbtn", type: "button", "aria-label": "위로", disabled: idx === 0 ? "" : null, onclick: () => moveFolderStep(f, -1) }, "▲") : null,
@@ -1271,7 +1405,7 @@ function renderWeek() {
   const head = $("#wkhead"), all = $("#wkall"), body = $("#wkbody");
   head.textContent = ""; all.textContent = ""; body.textContent = "";
   const byD = dates.map((d) => eventsOn(d));
-  let s0 = 6, e0 = 24;
+  let s0 = 0, e0 = 24; // 하루 전체 (0시~24시)
   byD.flat().filter(inGrid).forEach((t) => { s0 = Math.min(s0, Math.floor(t.start / 60)); e0 = Math.max(e0, Math.ceil(t.end / 60)); });
   const HH = calWide() ? 52 : 38, H = (e0 - s0) * HH;
 
@@ -1292,7 +1426,7 @@ function renderWeek() {
   });
 
   const gut = h("div", { class: "gut", style: `height:${H}px` });
-  for (let hr = s0 + 1; hr < e0; hr++) gut.append(h("span", { style: `top:${(hr - s0) * HH}px` }, pad(hr)));
+  for (let hr = s0; hr <= e0; hr++) gut.append(h("span", { class: hr === s0 ? "f" : hr === e0 ? "l" : "", style: `top:${(hr - s0) * HH}px` }, pad(hr)));
   body.append(gut);
   dates.forEach((d, i) => {
     const c = h("div", { class: "dcol" + (d === today ? " today" : ""), style: `height:${H}px;background-size:100% ${HH}px` });
@@ -1442,6 +1576,41 @@ function openDaySheet(date) {
 /* =========================================================
    일정 편집창
    ========================================================= */
+/* ---------- 시간 입력: [오전|오후] 토글 + 시(1~12) + 분(5분 단위) ---------- */
+function timeField(init, opt = {}) {
+  let pm = false;
+  const hs = h("select", { class: "tf-h", "aria-label": "시" }), ms = h("select", { class: "tf-m", "aria-label": "분" });
+  if (opt.optional) hs.append(h("option", { value: "" }, "--"));
+  for (let i = 1; i <= 12; i++) hs.append(h("option", { value: String(i) }, String(i)));
+  const addMin = (m) => ms.append(h("option", { value: String(m) }, pad(m)));
+  for (let m = 0; m < 60; m += 5) addMin(m);
+  const am = h("span", {}, "오전"), pmS = h("span", {}, "오후");
+  const ap = h("button", { class: "tf-ap", type: "button", "aria-label": "오전/오후 바꾸기" }, am, pmS);
+  const el = h("div", { class: "tf" }, ap, hs, h("span", { class: "tf-c" }, ":"), ms);
+  const api = { el, onchange: null };
+  const draw = () => {
+    am.className = pm ? "" : "on"; pmS.className = pm ? "on" : "";
+    const empty = hs.value === ""; ap.disabled = empty; ms.disabled = empty; el.classList.toggle("empty", empty);
+  };
+  const fire = () => { draw(); api.onchange && api.onchange(); };
+  ap.onclick = () => { pm = !pm; fire(); };                       // 한 번 누르면 오전 ↔ 오후
+  hs.onchange = () => { if (hs.value !== "" && ms.disabled) ms.value = "0"; fire(); };
+  ms.onchange = fire;
+  api.set = (min) => {
+    if (min == null) { if (opt.optional) hs.value = ""; else { hs.value = "9"; ms.value = "0"; pm = false; } draw(); return; }
+    const m = min % 1440; pm = m >= 720; hs.value = String((Math.floor(m / 60) % 12) || 12);
+    const mm = m % 60; if (![...ms.options].some((o) => Number(o.value) === mm)) { addMin(mm); [...ms.options].sort((a, b) => a.value - b.value).forEach((o) => ms.append(o)); }
+    ms.value = String(mm); draw();
+  };
+  api.get = () => {
+    if (hs.value === "") return null;
+    const v = (Number(hs.value) % 12 + (pm ? 12 : 0)) * 60 + Number(ms.value);
+    return opt.end && v === 0 ? 1440 : v;                           // 끝 시간 '오전 12:00' = 자정(24:00)
+  };
+  api.set(init);
+  return api;
+}
+
 function openTaskEditor(t, isNew = false, back = null) {
   const d = { title: "", folderId: null, effort: 0, color: null, date: null, start: null, end: null, ...t };
   let color = d.color, effort = d.effort || 0, kind = kindOf(d);
@@ -1452,17 +1621,17 @@ function openTaskEditor(t, isNew = false, back = null) {
   const fFolder = h("select", {}, opts.map((o) => h("option", { value: o.id ?? "" }, o.label)));
   fFolder.value = d.folderId || "";
   const fDate = h("input", { type: "date", value: d.date || "" });
-  const fS = h("input", { type: "time", value: d.start != null ? fmtMin(d.start) : "" });
-  const fE = h("input", { type: "time", value: d.end != null ? fmtMin(d.end) : "" });
+  const tfS = timeField(d.start, { optional: true }), tfE = timeField(d.end ?? (d.start != null ? Math.min(d.start + 60, 1440) : null), { optional: true, end: true });
+  tfS.onchange = () => { const a = tfS.get(), b = tfE.get(); if (a != null && (b == null || b <= a)) tfE.set(Math.min(a + 60, 1440)); };
   const lblS = h("label", { class: "flabel" }, "시작");
-  const endBox = h("div", { style: "flex:1" }, h("label", { class: "flabel" }, "끝"), fE);
-  const timeRow = h("div", { class: "field row2" }, h("div", { style: "flex:1" }, lblS, fS), endBox);
+  const endBox = h("div", { class: "field" }, h("label", { class: "flabel" }, "끝"), tfE.el);
+  const timeRow = h("div", {}, h("div", { class: "field" }, lblS, tfS.el), endBox);
   const kindWrap = h("div", { class: "efforts" }), kindHint = h("div", { class: "sub", style: "font-size:12px;margin-top:6px" });
   const HINT = { allday: "달력에 배경이 꽉 찬 바로 표시돼요", timed: "달력에 세로선과 제목으로 표시돼요", reminder: "달력에 동그라미 체크박스로 표시돼요 — 눌러서 바로 완료" };
   const drawKind = () => {
     kindWrap.textContent = "";
     [["allday", "종일"], ["timed", "시간 지정"], ["reminder", "리마인더"]].forEach(([k, label]) => kindWrap.append(h("button", { type: "button", class: k === kind ? "on" : "",
-      onclick: () => { kind = k; if (k === "timed" && !fS.value) { fS.value = "09:00"; fE.value = "10:00"; } drawKind(); } }, label)));
+      onclick: () => { kind = k; if (k === "timed" && tfS.get() == null) { tfS.set(540); tfE.set(600); } drawKind(); } }, label)));
     timeRow.classList.toggle("hidden", kind === "allday"); endBox.classList.toggle("hidden", kind !== "timed");
     lblS.textContent = kind === "reminder" ? "알림 시간 (선택)" : "시작"; kindHint.textContent = HINT[kind];
   };
@@ -1509,7 +1678,7 @@ function openTaskEditor(t, isNew = false, back = null) {
   attachSuggest(fTitle, (tp) => {
     color = tp.color || null; effort = tp.effort || 0; kind = kindOf(tp);
     if (activeId(tp.folderId)) fFolder.value = tp.folderId;
-    if (tp.start != null) { fS.value = fmtMin(tp.start); fE.value = fmtMin(tp.end ?? Math.min(tp.start + 60, 1440)); }
+    if (tp.start != null) { tfS.set(tp.start); tfE.set(tp.end ?? Math.min(tp.start + 60, 1440)); }
     drawSw(); drawEf(); drawKind();
   });
 
@@ -1517,10 +1686,10 @@ function openTaskEditor(t, isNew = false, back = null) {
     const title = fTitle.value.trim();
     let date = fDate.value || null, start = null, end = null, k = kind;
     if (k === "timed") {
-      start = toMin(fS.value);
+      start = tfS.get();
       if (start == null) k = "allday";
-      else { end = toMin(fE.value); if (end == null || end <= start) end = Math.min(start + 60, 1440); if (end <= start) { start = 1410; end = 1440; } }
-    } else if (k === "reminder") start = toMin(fS.value);
+      else { end = tfE.get(); if (end == null || end <= start) end = Math.min(start + 60, 1440); if (end <= start) { start = 1410; end = 1440; } }
+    } else if (k === "reminder") start = tfS.get();
     if ((k !== "allday" || rep.size) && !date) date = S.date;
     const days = [1, 2, 3, 4, 5, 6, 0].filter((x) => rep.has(x));
     return { title, folderId: fFolder.value || null, date, start, end, color, effort, kind: k === "reminder" ? "reminder" : "event",
@@ -1629,22 +1798,78 @@ function renderRoutine() {
   const all = routinesOn(date);
   const rs = all.filter((r) => S.catFilter === "all" || (S.catFilter === "none" ? !r.catId : r.catId === S.catFilter));
   if (!S.routines.length) list.append(h("div", { class: "empty" }, "아직 루틴이 없어요. 아래 “+ 루틴 추가”로 만들어 보세요."));
+  else if (rs.length > 1) list.append(h("div", { class: "hint", style: "margin:2px 2px 0" }, "루틴을 꾹 눌러서(PC는 끌어서) 같은 시간대 안에서 순서를 바꿀 수 있어요"));
   SLOTS.forEach(([k, label]) => {
     const items = rs.filter((r) => (r.slot || "morning") === k);
     const kept = items.filter((r) => S.logs.get(`${r.id}|${date}`)).length;
     const sec = h("div", { class: "rsec" }, h("div", { class: "sec-h" }, h("span", {}, label), h("span", {}, items.length ? `${kept}/${items.length}` : "")));
     if (!items.length) sec.append(h("div", { class: "empty" }, "이 시간대 루틴 없음"));
     items.forEach((r) => sec.append(routineRow(r, date, low)));
+    if (items.length > 1) makeSortable(sec, ".routine", (ids) => reorderKeys("routines", "order", items, ids, (x) => x.order ?? x.createdAt ?? 0));
     list.append(sec);
   });
+  renderMeals();
 }
+/* =========================================================
+   식단 기록 (루틴 화면 오른쪽 / 모바일은 맨 아래)  meals: {date, slot, snack, text, createdAt}
+   ========================================================= */
+const nextSlot = (k) => SLOTS[(SLOTS.findIndex((x) => x[0] === k) + 1) % SLOTS.length][0];
+const slotLabel = (k) => (SLOTS.find((x) => x[0] === k) || SLOTS[0])[1];
+const slotNow = () => { const hr = new Date().getHours(); return hr < 11 ? "morning" : hr < 16 ? "noon" : "evening"; };
+function drawMealForm() {
+  if (!S.mSlot) S.mSlot = slotNow();
+  $("#mSlot").textContent = slotLabel(S.mSlot) + " ↻";
+  $("#mSnack").classList.toggle("on", S.mSnack);
+}
+$("#mSlot").onclick = () => { S.mSlot = nextSlot(S.mSlot || slotNow()); drawMealForm(); };   // 누를 때마다 아침→점심→저녁→아침
+$("#mSnack").onclick = () => { S.mSnack = !S.mSnack; drawMealForm(); };
+function addMeal() {
+  const text = $("#mInput").value.trim(); if (!text || !S.uid) { $("#mInput").focus(); return; }
+  addDoc(col("meals"), { date: S.date, slot: S.mSlot || slotNow(), snack: S.mSnack, text, createdAt: Date.now() });
+  $("#mInput").value = ""; $("#mInput").focus();
+}
+$("#mAdd").onclick = addMeal;
+$("#mInput").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.isComposing) addMeal(); });
+function renderMeals() {
+  drawMealForm();
+  const d = parseYmd(S.date);
+  $("#mealDate").textContent = `${d.getMonth() + 1}/${d.getDate()} (${DOW[d.getDay()]})` + (S.date === todayStr() ? " · 오늘" : "");
+  const box = $("#mealList"); box.textContent = "";
+  const day = S.meals.filter((m) => m.date === S.date);
+  SLOTS.forEach(([k, label]) => {
+    const inSlot = day.filter((m) => (m.slot || "morning") === k);
+    const meals = inSlot.filter((m) => !m.snack).sort((a, b) => a.createdAt - b.createdAt), snacks = inSlot.filter((m) => m.snack).sort((a, b) => a.createdAt - b.createdAt);
+    const sec = h("div", { class: "msec", "data-slot": k }, h("div", { class: "sec-h", style: "margin:0 0 2px" }, h("span", {}, label), h("span", {}, inSlot.length || "")));
+    if (!inSlot.length) sec.append(h("div", { class: "empty" }, "기록 없음"));
+    [...meals, ...snacks].forEach((m) => sec.append(h("button", { class: "mrow" + (m.snack ? " snack" : ""), type: "button", onclick: () => openMealEditor(m) },
+      m.snack ? h("span", { class: "mtag" }, "간식") : null, h("span", { class: "mt" }, m.text))));   // 간식은 해당 시간대 식사 아래에 자동 배치
+    box.append(sec);
+  });
+}
+function openMealEditor(m) {
+  let slot = m.slot || "morning", snack = !!m.snack;
+  const fT = h("input", { type: "text", value: m.text });
+  const slotB = h("button", { class: "slotbtn", type: "button", onclick: () => { slot = nextSlot(slot); draw(); } });
+  const snB = h("button", { class: "chip", type: "button", onclick: () => { snack = !snack; draw(); } }, "간식");
+  const draw = () => { slotB.textContent = slotLabel(slot) + " ↻"; snB.classList.toggle("on", snack); };
+  draw();
+  openModal(h("div", {}, h("h3", {}, "식단 편집"),
+    h("div", { class: "field" }, h("label", {}, "먹은 것"), fT),
+    h("div", { class: "field" }, h("label", {}, "시간대 (누를 때마다 바뀜)"), h("div", { class: "optrow", style: "margin:0" }, slotB, snB)),
+    h("div", { class: "actions" },
+      h("button", { class: "btn", type: "button", onclick: () => { const text = fT.value.trim(); if (!text) { fT.focus(); return; } closeModal(); updateDoc(dref("meals", m.id), { text, slot, snack }); } }, "저장"),
+      h("button", { class: "btn ghost", type: "button", onclick: closeModal }, "취소"),
+      h("button", { class: "btn danger", type: "button", onclick: () => { closeModal(); deleteDoc(dref("meals", m.id)); } }, "삭제"))));
+  setTimeout(() => fT.focus(), 50);
+}
+
 function routineRow(r, date, low) {
   const st = S.logs.get(`${r.id}|${date}`), hasB = !!(r.planB && r.planB.trim()), useB = low && hasB;
   const chk = h("button", { class: "check" + (st === "full" ? " on" : st === "planb" ? " b" : ""), type: "button",
     onclick: () => setLog(r.id, date, useB ? "planb" : "full", chk) }, st === "full" ? "✓" : st === "planb" ? "B" : "");
   const cat = S.cats.find((c) => c.id === r.catId), chain = chainOf(r, date);
   const sub = [useB ? "원래 루틴: " + r.title : null, cat ? cat.name : null, chain >= 2 ? `연속 ${chain}일` : null].filter(Boolean).join(" · ");
-  const item = h("div", { class: "routine" }, h("div", { class: "rhead" }, chk,
+  const item = h("div", { class: "routine", "data-id": r.id }, h("div", { class: "rhead" }, chk,
     h("button", { type: "button", onclick: () => openRoutineEditor(r) }, h("span", { class: "rtitle" }, useB ? r.planB : r.title), sub ? h("span", { class: "rsub" }, sub) : null),
     h("button", { class: "txtbtn", type: "button", onclick: () => openRoutineEditor(r) }, "⋯")));
   if (hasB && !useB) {
