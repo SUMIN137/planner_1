@@ -110,6 +110,8 @@
      모바일: 하단 5탭(보관함 = 아이디어 → 폴더 → 진행바 세로 흐름) / PC(1200px↑): 아이디어 저장소(항상) | [달력 화면에서만: 폴더 | 진행바] | 메인
      ========================================================= */
   #shell { min-height: 100dvh; display: block; padding-bottom: 64px; }
+  #shell.sliding { overflow-x: clip; }
+  @media (max-width: 1199px) { #shell { touch-action: pan-y pinch-zoom; } #nav, #top { touch-action: none; } }
   #top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between;
     height: 48px; padding: 0 14px; background: var(--bg); border-bottom: 1px solid var(--line); }
   .logo { font-weight: 700; letter-spacing: -.2px; }
@@ -257,7 +259,7 @@
        종일 일정  = 배경이 꽉 찬 가로 바
        시간 일정  = 바 없음, 제목 앞에 작은 점(또는 세로선)
      ========================================================= */
-  .ev { display: block; width: 100%; font-size: 10.5px; line-height: 1.25; padding: 1px 4px; margin-top: 2px; border-radius: 4px;
+  .ev { display: block; width: 100%; font-size: 9.5px; line-height: 1.22; padding: 1px 4px; margin-top: 2px; border-radius: 4px;
     overflow: hidden; white-space: normal; overflow-wrap: anywhere; text-align: left; position: relative; } /* 줄임표(...) 없이 여러 줄로 */
   .ev.allday { background: var(--ef, var(--c0)); color: var(--et, var(--ink)); }
   .ev.timed { padding-left: 9px; color: var(--ink); }
@@ -271,7 +273,7 @@
   .ev.rem .rchk { margin-top: 1px; }
   .ev.done { opacity: .5; text-decoration: line-through; }
   .sun { color: var(--sun) !important; } .sat { color: var(--sat) !important; }
-  .hol { display: block; font-size: 9.5px; line-height: 1.2; white-space: normal; overflow-wrap: anywhere; padding: 0 2px; }
+  .hol { display: block; font-size: 8.5px; line-height: 1.2; white-space: normal; overflow-wrap: anywhere; padding: 0 2px; }
   .hol { font-weight: 700; } .hol.kr, .hol.ca { color: var(--sun); } /* 한국(한글)·캐나다(영어) 모두 같은 굵은 빨강 */
 
   /* 월간 */
@@ -284,25 +286,26 @@
   .mcell .num { font-weight: 800; font-size: 12.5px; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; }
   .mcell.today .num { background: var(--ink); color: var(--inkfg) !important; }
   .mcell .dmark { position: absolute; right: 4px; top: 4px; font-size: 10px; color: var(--sub); }
-  .mmore { font-size: 10px; color: var(--sub); padding: 1px 4px; }
+  .mmore { font-size: 9px; color: var(--sub); padding: 1px 4px; }
   .blk.cont-next { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: -1px; }
   .blk.cont-prev { border-top-left-radius: 0; border-top-right-radius: 0; }
   /* 모바일 요약 보기: 종일=긴 바 · 시간=중간 바 · 리마인더=점 */
-  #monthView.compact .mcell { min-height: 54px; padding: 2px 2px 4px; }
+  #monthView.compact .mcell { min-height: 46px; padding: 2px 2px 3px; }
   #monthView.compact .mcell .num { margin: 0 auto 1px 0; }
-  .mk { display: block; height: 4px; border-radius: 2px; margin-top: 3px; background: var(--ec, var(--d0)); }
-  .mk.a { width: 100%; } .mk.t { width: 58%; }
-  .mkdots { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 3px; }
-  .mk.r { width: 6px; height: 6px; border-radius: 50%; margin: 0; box-sizing: border-box; }
-  .mk.r.done { background: transparent; border: 1.5px solid var(--ec, var(--d0)); }
+  .mk { display: block; height: 2px; border-radius: 1px; margin-top: 3px; background: var(--ec, var(--d0)); }
+  .mk.a { width: 100%; } .mk.t { width: 50%; }
+  .mkdots { display: flex; gap: 2px; flex-wrap: wrap; margin-top: 3px; }
+  .mk.r { width: 5px; height: 5px; border-radius: 50%; margin: 0; box-sizing: border-box; background: transparent; border: 1px solid var(--ec, var(--d0)); } /* ○ 미완료 */
+  .mk.r.done { background: var(--ec, var(--d0)); } /* ● 완료 */
   .mcell.sel { background: var(--hover); box-shadow: inset 0 0 0 1.5px var(--ink); }
-  #mgrip { display: none; width: 100%; padding: 8px 0 4px; color: var(--sub); font-size: 12px; text-align: center; }
+  #mgrip { display: none; width: 100%; padding: 8px 0 4px; color: var(--sub); font-size: 11.5px; text-align: center; }
+  #mgrip.pull { color: var(--ink); font-weight: 600; }
   @media (max-width: 1199px) { #mgrip { display: block; } }
   #mdetail { margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--line); }
   .mdhead { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
   #mdTitle { margin: 6px 0; font-size: 16px; }
   #mdHol { font-size: 12px; color: var(--sub); }
-  @container mg (max-width: 599px) { .mcell { min-height: 92px; padding: 2px; } .ev { font-size: 9.5px; padding: 1px 2px; } .ev.timed { padding-left: 8px; } .ev.timed::before { left: 2px; } .hol { font-size: 8.5px; } }
+  @container mg (max-width: 599px) { .mcell { min-height: 92px; padding: 2px; } .ev { font-size: 8.5px; line-height: 1.2; padding: 1px 2px; } .ev.timed { padding-left: 7px; } .ev.timed::before { left: 2px; width: 1.5px; } .hol { font-size: 7.5px; } .mmore { font-size: 8px; } }
 
   /* 주간: 월~일 7열 압축 시간표 (가로 스크롤 없음) */
   .wkwrap { position: relative; overflow-y: auto; overflow-x: hidden; max-height: calc(100dvh - 230px); min-height: 320px; border: 1px solid var(--line);
@@ -888,13 +891,84 @@ function renderAll() {
 }
 mqDesk.addEventListener("change", renderAll);
 { let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { S.needScroll = true; renderAll(); }, 160); }); }
+/* =========================================================
+   부드러운 화면 전환 (슬라이드) — 모바일: 탭을 누르거나 쓸어서 넘기면 손가락 방향으로 밀려 나가고 반대편에서 들어와요
+   ========================================================= */
+const TAB_ORDER = ["plan", "dump", "routine", "journal", "track"];
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+const frames = (n) => new Promise((r) => { const f = () => (--n <= 0 ? r() : requestAnimationFrame(f)); requestAnimationFrame(f); });
+const pageEls = () => (S.tab === "dump" ? ["#side", "#fside", "#pside"] : ["#main"]).map((q) => $(q));
+function setX(els, x, ms) {
+  const w = innerWidth, o = 1 - Math.min(Math.abs(x) / w, 1) * 0.7;
+  els.forEach((e) => { e.style.transition = ms ? `transform ${ms}ms cubic-bezier(.22,.7,.25,1), opacity ${ms}ms ease` : "none"; e.style.transform = x ? `translate3d(${x}px,0,0)` : ""; e.style.opacity = x ? o : ""; });
+}
+const clearX = (els) => els.forEach((e) => { e.style.transition = ""; e.style.transform = ""; e.style.opacity = ""; });
+/* getEls: 움직일 요소들, dir: +1 = 다음(오른쪽에서 들어옴) / -1 = 이전, fn: 실제 화면 바꾸는 일, fromX: 손가락으로 이미 끌고 온 거리 */
+let sliding = false;
+async function slideSwap(getEls, dir, fn, fromX = 0) {
+  if (sliding) return;
+  if (mqDesk.matches || reduceMotion.matches || !dir) { fn(); return; }
+  sliding = true; const sh = $("#shell"); sh.classList.add("sliding");
+  const W = innerWidth;
+  let els = getEls();
+  if (fromX) setX(els, fromX, 0);
+  await frames(1);
+  setX(els, -dir * W * 0.45, 140);                       // 나가기
+  await new Promise((r) => setTimeout(r, 150));
+  clearX(els); fn(); await frames(2);                     // 화면 바꾸기(렌더링 대기)
+  els = getEls(); setX(els, dir * W * 0.35, 0); void els[0] && els[0].offsetWidth;
+  await frames(1); setX(els, 0, 230);                     // 들어오기
+  await new Promise((r) => setTimeout(r, 240));
+  clearX(els); sh.classList.remove("sliding"); sliding = false;
+}
+function switchTab(tab, dragX = 0) {
+  if (tab === S.tab) return;
+  const dir = TAB_ORDER.indexOf(tab) > TAB_ORDER.indexOf(S.tab) ? 1 : -1;
+  slideSwap(pageEls, dir, () => {
+    S.tab = tab; S.needScroll = true; renderAll();
+    if (S.tab === "dump") setTimeout(() => $("#dumpInput").focus(), 60);
+    if (S.tab === "journal" && !$("#qText").value) $("#qDate").value = todayStr();
+    window.scrollTo(0, 0);
+  }, dragX);
+  if (mqDesk.matches) { const m = $("#main"); m.style.opacity = "0"; requestAnimationFrame(() => { m.style.transition = "opacity .18s"; m.style.opacity = ""; setTimeout(() => (m.style.transition = ""), 200); }); }
+}
 $("#nav").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-tab]"); if (!b) return;
-  S.tab = b.dataset.tab; S.needScroll = true; renderAll();
-  if (S.tab === "dump") setTimeout(() => $("#dumpInput").focus(), 60);
-  if (S.tab === "journal" && !$("#qText").value) $("#qDate").value = todayStr();
-  window.scrollTo(0, 0);
+  switchTab(b.dataset.tab);
 });
+/* 손가락 따라가는 탭 넘기기: 하단 탭줄·상단 바에서 좌우로 쓸기(모든 화면) / 보관함·루틴·일기·주간은 화면 어디서나 좌우로 쓸기
+   (달력 화면의 좌우 쓸기는 이전/다음 달·주 이동에 쓰이므로 달력에서는 하단 탭줄·상단 바에서만) */
+{
+  let st = null;
+  const idx = () => TAB_ORDER.indexOf(S.tab);
+  const nextTab = (dx) => TAB_ORDER[idx() + (dx < 0 ? 1 : -1)] || null;
+  document.addEventListener("touchstart", (e) => {
+    st = null;
+    if (mqDesk.matches || sliding || SORT.active || e.touches.length !== 1 || !$("#modal").classList.contains("hidden")) return;
+    const tg = e.target, bar = tg.closest("#nav, #top");
+    const content = !bar && S.tab !== "plan" && tg.closest("#main, #side, #fside, #pside") && !tg.closest("input, textarea, select, [draggable=true], .sortable");
+    if (!bar && !content) return;
+    st = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now(), dir: null };
+  }, { passive: true });
+  document.addEventListener("touchmove", (e) => {
+    if (!st || SORT.active) return;
+    const dx = e.touches[0].clientX - st.x, dy = e.touches[0].clientY - st.y;
+    if (!st.dir && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) st.dir = Math.abs(dx) > Math.abs(dy) * 1.2 ? "h" : "v";
+    if (st.dir !== "h") return;
+    $("#shell").classList.add("sliding");
+    setX(pageEls(), nextTab(dx) ? dx : dx * 0.25, 0);       // 끝 탭에서는 고무줄처럼 살짝만
+  }, { passive: true });
+  const done = (e, cancel) => {
+    if (!st) return; const s0 = st; st = null;
+    if (s0.dir !== "h") return;
+    const dx = (e.changedTouches ? e.changedTouches[0].clientX : s0.x) - s0.x, dt = Math.max(1, Date.now() - s0.t);
+    const go = !cancel && nextTab(dx) && (Math.abs(dx) > innerWidth * 0.28 || (Math.abs(dx) / dt > 0.55 && Math.abs(dx) > 50));
+    if (go) switchTab(nextTab(dx), dx);
+    else { setX(pageEls(), 0, 200); setTimeout(() => { clearX(pageEls()); $("#shell").classList.remove("sliding"); }, 220); }
+  };
+  document.addEventListener("touchend", (e) => done(e, false), { passive: true });
+  document.addEventListener("touchcancel", (e) => done(e, true), { passive: true });
+}
 
 /* =========================================================
    폴더 도우미  (폴더는 "삭제"가 아니라 "보관" 처리 → 기록 보존)
@@ -1551,20 +1625,33 @@ function renderWeek() {
     }
   }
 }
-// 모바일 제스처: 좌우 = 이전/다음 달·주, 위로 = 요약 보기(달력 반 크기 + 하루 일정), 아래로 = 전체 달력 복원
+// 모바일 제스처: 좌우 = 이전/다음 달·주, 위로 '길게 쭉' = 요약 보기, 아래로 쭉 = 전체 달력 복원
+// 화면이 실제로 스크롤된 경우·짧게 밀린 경우·비스듬한 경우에는 전환하지 않아요(새로고침 당기기처럼 확실히 밀어야 함)
 {
-  let sx = 0, sy = 0, tgt = null; const pl = $("#plan");
-  pl.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; tgt = e.target; }, { passive: true });
+  let sx = 0, sy = 0, y0 = 0, tgt = null, t0 = 0; const pl = $("#plan"), grip = $("#mgrip");
+  const need = (up) => Math.max(up ? 170 : 120, innerHeight * (up ? 0.26 : 0.18));
+  const gripText = () => (grip.textContent = S.mcompact ? "⌄ 아래로 밀면 전체 달력" : "⌃ 위로 밀면 요약 + 하루 일정");
+  pl.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; y0 = window.scrollY; t0 = Date.now(); tgt = e.target; }, { passive: true });
+  pl.addEventListener("touchmove", (e) => {   // 얼마나 밀었는지 살짝 알려 주기
+    if (mqDesk.matches || S.view !== "month" || SORT.active) return;
+    const dx = e.touches[0].clientX - sx, dy = e.touches[0].clientY - sy, up = dy < 0;
+    if (Math.abs(window.scrollY - y0) > 4 || Math.abs(dy) < 40 || Math.abs(dy) < Math.abs(dx) * 2 || (up === S.mcompact)) { gripText(); grip.classList.remove("pull"); return; }
+    const p = Math.min(1, Math.abs(dy) / need(up));
+    grip.classList.add("pull"); grip.textContent = p >= 1 ? (up ? "놓으면 요약 보기로 바뀌어요" : "놓으면 전체 달력으로 돌아가요") : (up ? "⌃ 계속 위로 밀어 올리세요 " : "⌄ 계속 아래로 밀어 내리세요 ") + Math.round(p * 100) + "%";
+  }, { passive: true });
   pl.addEventListener("touchend", (e) => {
+    grip.classList.remove("pull"); gripText();
     if (!$("#modal").classList.contains("hidden") || SORT.active) return;
     const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
-    if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx) * 1.5) {
+    const vertical = Math.abs(dy) > Math.abs(dx) * 2;
+    if (vertical && Math.abs(dy) > 40) {
       if (S.view !== "month" || mqDesk.matches || effTab() !== "plan") return;
-      if (dy < 0 && !S.mcompact) setCompact(true);
-      else if (dy > 0 && S.mcompact && ((tgt && tgt.closest && tgt.closest("#monthGrid")) || window.scrollY <= 2)) setCompact(false);
+      if (Math.abs(window.scrollY - y0) > 4) return;             // 화면이 스크롤됐다면 그냥 스크롤한 것
+      if (dy < 0 && !S.mcompact && Math.abs(dy) >= need(true) && tgt && tgt.closest && tgt.closest("#monthGrid")) setCompact(true);
+      else if (dy > 0 && S.mcompact && Math.abs(dy) >= need(false) && ((tgt && tgt.closest && tgt.closest("#monthGrid")) || window.scrollY <= 2)) setCompact(false);
       return;
     }
-    if (Math.abs(dx) > 70 && Math.abs(dy) < 45) shiftDate(dx < 0 ? 1 : -1);
+    if (Math.abs(dx) > 70 && Math.abs(dy) < 45) { const d = dx < 0 ? 1 : -1; slideSwap(() => [$("#plan")], d, () => shiftDate(d)); }
   }, { passive: true });
 }
 
@@ -2079,7 +2166,7 @@ function tier(rate) {
   if (rate == null) return { label: "기록 없음", color: "var(--line)", star: false };
   if (rate >= 80) return { label: "아주 잘함", color: "var(--g)", star: true };
   if (rate >= 60) return { label: "중간", color: "var(--y)", star: false };
-  if (rate >= 31) return { label: "조금만 더", color: "var(--sub)", star: false };
+  if (rate >= 30) return { label: "조금만 더", color: "var(--sub)", star: false };
   return { label: "노력 필요", color: "var(--r)", star: false };
 }
 const pct = (d, t) => (t ? Math.round((d / t) * 100) : null);
@@ -2131,7 +2218,7 @@ function renderTrack() {
       h("div", { class: "ring", style: `--p:${st.overall.rate || 0};--rc:${t.color}` }, h("div", { class: "ringin" }, st.overall.rate == null ? "—" : st.overall.rate + "%")),
       h("div", {}, h("div", { class: "tierlabel" }, (t.star ? "★ " : "") + t.label),
         h("div", { class: "sub", style: "font-size:13px;margin-top:4px" }, st.overall.total ? `오늘까지 ${st.overall.total}개 중 ${st.overall.done}개 완료` : "이 주에는 아직 기록할 항목이 없어요"),
-        h("div", { class: "sub", style: "font-size:12px;margin-top:6px" }, "80%↑ 아주 잘함 · 60%대 중간 · 31~59% 조금만 더 · 30%↓ 노력 필요")))));
+        h("div", { class: "sub", style: "font-size:12px;margin-top:6px" }, "달성률 80점 이상 아주 잘함 · 60~79점 중간 · 30~59점 조금만 더 · 30점 미만 노력 필요")))));
 
   const bars = h("div", { class: "dbars" });
   st.days.forEach((d, i) => {
