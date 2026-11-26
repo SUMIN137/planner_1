@@ -185,6 +185,7 @@
   .check.b { background: transparent; color: var(--ink); border-color: var(--ink); font-weight: 700; font-size: 11px; }
   .title { display: block; line-height: 1.35; word-break: break-word; position: relative; }
   .title small { display: block; color: var(--sub); font-size: 12px; margin-top: 1px; }
+  #side .title { font-size: 14px; } #side .title small { font-size: 11px; }   /* 진행바 리스트(.ptitle 14px / .pmeta 11px)와 같은 크기 */
   .title > span { position: relative; }
   .sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; background: var(--ec, var(--d0)); }
   .task.done .title { color: var(--sub); }
@@ -211,6 +212,10 @@
   .fname { flex: 1; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cnt { font-size: 12px; color: var(--sub); padding: 0 4px; }
   .fbody .task { padding-left: 24px; }
+  .agroup { margin-top: 14px; } .agroup:first-of-type { margin-top: 6px; }
+  .ahead { display: flex; align-items: baseline; justify-content: space-between; font-weight: 700; font-size: 14px; padding: 4px 0; border-bottom: 1.5px solid var(--ink); }
+  .ahead small { color: var(--sub); font-weight: 400; font-size: 12px; }
+  .aitems { margin-left: 12px; border-left: 2px solid var(--line); padding-left: 8px; }
   .arch-row { display: flex; align-items: center; gap: 6px; padding: 7px 2px; border-bottom: 1px solid var(--line); font-size: 13px; }
   .arch-row .nm { flex: 1; min-width: 0; word-break: break-word; }
 
@@ -259,9 +264,13 @@
        종일 일정  = 배경이 꽉 찬 가로 바
        시간 일정  = 바 없음, 제목 앞에 작은 점(또는 세로선)
      ========================================================= */
-  .ev { display: block; width: 100%; font-size: 9.5px; line-height: 1.22; padding: 1px 4px; margin-top: 2px; border-radius: 4px;
+  .ev { display: block; width: 100%; font-size: 11px; line-height: 1.25; padding: 1px 4px; margin-top: 2px; border-radius: 4px;
     overflow: hidden; white-space: normal; overflow-wrap: anywhere; text-align: left; position: relative; } /* 줄임표(...) 없이 여러 줄로 */
   .ev.allday { background: var(--ef, var(--c0)); color: var(--et, var(--ink)); }
+  .mbar { position: absolute; z-index: 1; box-sizing: border-box; padding: 1px 4px; font-size: 11px; line-height: 1.25; text-align: left;
+    white-space: normal; overflow-wrap: anywhere; overflow: hidden; background: var(--ef, var(--c0)); color: var(--et, var(--ink)); }
+  .mbar.s { border-top-left-radius: 4px; border-bottom-left-radius: 4px; } .mbar.e { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+  .bsp { margin-top: 2px; }
   .ev.timed { padding-left: 9px; color: var(--ink); }
   .ev.timed::before { content: ""; position: absolute; left: 3px; top: 2px; bottom: 2px; width: 2px; min-height: 10px; border-radius: 2px; background: var(--ec, var(--d0)); }
   .ev.rem { display: flex; align-items: flex-start; gap: 3px; padding: 1px 2px; color: var(--ink); }
@@ -270,14 +279,14 @@
   .rchk::before { content: ""; position: absolute; inset: -7px; }
   .rchk.on { background: var(--ec, var(--d0)); }
   .rt { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; text-align: left; font-size: inherit; line-height: inherit; color: inherit; }
-  .ev.rem .rchk { margin-top: 1px; }
+  .ev.rem .rchk { font-size: .8em; width: 1.2em; height: 1.2em; border-width: 1px; margin-top: .1em; }   /* 글자 크기에 맞춰 비례 */
   .ev.done { opacity: .5; text-decoration: line-through; }
   .sun { color: var(--sun) !important; } .sat { color: var(--sat) !important; }
-  .hol { display: block; font-size: 8.5px; line-height: 1.2; white-space: normal; overflow-wrap: anywhere; padding: 0 2px; }
+  .hol { display: block; font-size: 10px; line-height: 1.2; white-space: normal; overflow-wrap: anywhere; padding: 0 2px; }
   .hol { font-weight: 700; } .hol.kr, .hol.ca { color: var(--sun); } /* 한국(한글)·캐나다(영어) 모두 같은 굵은 빨강 */
 
   /* 월간 */
-  .mgrid { container: mg / inline-size; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); margin-top: 12px; }
+  .mgrid { container: mg / inline-size; position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); margin-top: 12px; }
   .mh { padding: 6px; font-size: 12px; color: var(--sub); text-align: center; border-bottom: 1px solid var(--line); }
   .mcell { min-height: 108px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 4px; cursor: pointer; overflow: hidden; position: relative; }
   .mcell:nth-child(7n) { border-right: 0; }
@@ -286,7 +295,7 @@
   .mcell .num { font-weight: 800; font-size: 12.5px; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; }
   .mcell.today .num { background: var(--ink); color: var(--inkfg) !important; }
   .mcell .dmark { position: absolute; right: 4px; top: 4px; font-size: 10px; color: var(--sub); }
-  .mmore { font-size: 9px; color: var(--sub); padding: 1px 4px; }
+  .mmore { font-size: 10.5px; color: var(--sub); padding: 1px 4px; }
   .blk.cont-next { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: -1px; }
   .blk.cont-prev { border-top-left-radius: 0; border-top-right-radius: 0; }
   /* 모바일 요약 보기: 종일=긴 바 · 시간=중간 바 · 리마인더=점 */
@@ -305,7 +314,7 @@
   .mdhead { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
   #mdTitle { margin: 6px 0; font-size: 16px; }
   #mdHol { font-size: 12px; color: var(--sub); }
-  @container mg (max-width: 599px) { .mcell { min-height: 92px; padding: 2px; } .ev { font-size: 8.5px; line-height: 1.2; padding: 1px 2px; } .ev.timed { padding-left: 7px; } .ev.timed::before { left: 2px; width: 1.5px; } .hol { font-size: 7.5px; } .mmore { font-size: 8px; } }
+  @container mg (max-width: 599px) { .mcell { min-height: 92px; padding: 2px; } .ev, .mbar { font-size: 8px; line-height: 1.2; padding: 1px 2px; } .ev.timed { padding-left: 7px; } .ev.timed::before { left: 2px; width: 1.5px; } .hol { font-size: 7px; } .mmore { font-size: 7.5px; } }
 
   /* 주간: 월~일 7열 압축 시간표 (가로 스크롤 없음) */
   .wkwrap { position: relative; overflow-y: auto; overflow-x: hidden; max-height: calc(100dvh - 230px); min-height: 320px; border: 1px solid var(--line);
@@ -479,7 +488,7 @@
 
 <div id="shell" class="hidden" data-tab="plan" data-eff="plan">
   <header id="top">
-    <div class="logo">플래너</div>
+    <div class="logo">Planner</div>
     <nav id="nav">
       <button data-tab="plan">달력</button>
       <button data-tab="dump">보관함</button>
@@ -1022,7 +1031,9 @@ const isRep = (t) => Array.isArray(t.repeat) && t.repeat.length > 0;
 // 완료 체크는 '아이디어/폴더 항목'과 '리마인더'에만 있음. 달력의 종일·시간 일정은 체크 없음(취소선 없음)
 const completable = (t) => !t.date || kindOf(t) === "reminder";
 const isRem = (t) => kindOf(t) === "reminder";
-const showInLists = (t) => !isRep(t) && !t.done;   // 완료하면 목록에서 사라지고 [완료 보관함]으로
+// 완료하면 목록에서 사라지고 [완료 보관함]으로. (예전 버전에서 체크해 둔 '날짜 있는 일반 일정'은 보관함에 넣지 않고 그대로 둠)
+const archivable = (t) => t.done && !isRep(t) && (!t.date || (isRem(t) && !!t.folderId));
+const showInLists = (t) => !isRep(t) && !(t.done && (!t.date || isRem(t)));
 
 function taskRow(t, o = {}) {
   const row = h("div", { class: "task" + (t.done ? " done" : "") + (S.justDone === t.id ? " pop" : ""), draggable: "true" });
@@ -1103,7 +1114,7 @@ function renderSide() {
   const dump = S.tasks.filter((t) => !t.date && !activeId(t.folderId) && !(t.folderId && folderById(t.folderId)) && showInLists(t))
     .sort((a, b) => (a.done - b.done) || (b.createdAt - a.createdAt)); // 최신 등록이 맨 위
   $("#dumpCount").textContent = dump.filter((t) => !t.done).length || "";
-  const nDone = S.tasks.filter((t) => t.done && !isRep(t)).length; $("#archCount").textContent = nDone ? " " + nDone : "";
+  const nDone = S.tasks.filter(archivable).length; $("#archCount").textContent = nDone ? " " + nDone : "";
   const dl = $("#dumpList"); dl.textContent = "";
   if (!dump.length) dl.append(h("div", { class: "empty" }, "비어 있어요. 위 입력창에 마음껏 쏟아내세요."));
   dump.forEach((t) => dl.append(taskRow(t, { move: true })));
@@ -1121,15 +1132,20 @@ function openArchive() {
   const box = h("div", {});
   const draw = () => {
     box.textContent = ""; box.append(h("h3", {}, "완료 보관함"));
-    const list = S.tasks.filter((t) => t.done && !isRep(t)).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
+    const list = S.tasks.filter(archivable).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
     if (!list.length) box.append(h("div", { class: "empty" }, "아직 없어요. 아이디어·폴더에서 완료 체크를 하면 여기에 모여요."));
-    list.forEach((t) => {
-      const chk = h("button", { class: "check on", type: "button", "aria-label": "체크 해제(원래 자리로)", onclick: () => toggleDone(t, chk) }, "✓");
-      const when = t.doneAt ? (() => { const d = new Date(t.doneAt); return `${d.getMonth() + 1}.${d.getDate()}`; })() : "–";
-      const where = activeId(t.folderId) || (t.folderId && folderById(t.folderId)) ? folderPath(t.folderId) : (t.date ? shortDate(t.date) : "아이디어");
-      box.append(h("div", { class: "prop arow", "data-id": t.id }, chk,
-        h("div", { class: "evt" }, h("div", {}, t.title), h("small", { style: "color:var(--sub)" }, where)),
-        h("span", { class: "t" }, when)));
+    // 완료한 날짜별로 묶기 (최근 날짜가 위)
+    const groups = new Map();
+    list.forEach((t) => { const key = t.doneAt ? ymd(new Date(t.doneAt)) : "none"; (groups.get(key) || groups.set(key, []).get(key)).push(t); });
+    [...groups.entries()].sort((a, b) => (a[0] === "none") - (b[0] === "none") || b[0].localeCompare(a[0])).forEach(([key, items]) => {
+      const head = key === "none" ? "완료 날짜 없음" : (() => { const d = parseYmd(key); return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (${DOW[d.getDay()]})`; })();
+      const body = h("div", { class: "aitems" });
+      items.forEach((t) => {
+        const chk = h("button", { class: "check on", type: "button", "aria-label": "체크 해제(원래 자리로)", onclick: () => toggleDone(t, chk) }, "✓");
+        const where = activeId(t.folderId) || (t.folderId && folderById(t.folderId)) ? folderPath(t.folderId) : (t.date ? shortDate(t.date) : "아이디어 저장소");
+        body.append(h("div", { class: "prop arow", "data-id": t.id }, chk, h("div", { class: "evt" }, h("div", {}, t.title), h("small", { style: "color:var(--sub)" }, where)), h("span", {})));
+      });
+      box.append(h("div", { class: "agroup" }, h("div", { class: "ahead" }, h("span", {}, head), h("small", {}, items.length + "개")), body));
     });
     box.append(h("div", { class: "hint", style: "margin:10px 0" }, "왼쪽 체크를 누르면 완료가 취소되고 원래의 아이디어 저장소/폴더로 돌아가요."),
       h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: closeModal }, "닫기")));
@@ -1505,6 +1521,29 @@ function dropOnDate(d) {
 
 const compactOn = () => S.mcompact && !mqDesk.matches && S.view === "month" && effTab() === "plan";
 function setCompact(v) { S.mcompact = v; renderAll(); }
+// 이어지는 바를 칸 위에 올리기: 바 높이(두 줄 필요하면 두 줄)를 재서 칸의 빈 자리(.bsp) 높이를 맞춘 뒤 위치를 잡음
+function layoutBars(grid, cells, rowInfo) {
+  const made = [];
+  rowInfo.forEach((ri, r) => {
+    const lh = new Array(ri.lanes).fill(0);
+    ri.segs.forEach((g) => {
+      const c0 = cells[r * 7 + g.sc], c1 = cells[r * 7 + g.ec], t = g.t, k = kindOf(t);
+      const l = c0.offsetLeft + (g.s ? 3 : 0), w = c1.offsetLeft + c1.offsetWidth - c0.offsetLeft - (g.s ? 3 : 0) - (g.e ? 3 : 0);
+      const label = (k === "timed" && g.s && t.start != null ? fmtMin(t.start) + " " : "") + t.title;
+      const bar = h("button", { class: "mbar col-" + (t.color || "c0") + (g.s ? " s" : "") + (g.e ? " e" : ""), type: "button", draggable: isRep(t) ? "false" : "true",
+        onclick: (e) => { e.stopPropagation(); openTaskEditor(t); } }, label);
+      bar.addEventListener("dragstart", (e) => { S.dragKind = "task"; S.dragId = t.id; e.dataTransfer.setData("text/plain", t.id); e.dataTransfer.effectAllowed = "move"; });
+      bar.addEventListener("dragend", () => { S.dragId = null; S.dragKind = null; });
+      bar.style.left = l + "px"; bar.style.width = w + "px"; bar.style.top = "0px";
+      grid.append(bar); lh[g.lane] = Math.max(lh[g.lane], bar.offsetHeight); made.push({ bar, g, r, c0 });
+    });
+    for (let c = 0; c < 7; c++) cells[r * 7 + c].querySelectorAll(".bsp").forEach((sp) => { sp.style.height = lh[+sp.dataset.l] + "px"; });
+  });
+  made.forEach(({ bar, g, c0 }) => {   // 칸 높이가 정해진 뒤 위치 확정
+    const sp = c0.querySelector('.bsp[data-l="' + g.lane + '"]');
+    bar.style.top = c0.offsetTop + sp.offsetTop + "px"; bar.style.height = sp.offsetHeight + "px";
+  });
+}
 function renderMonth() {
   const first = monthStartOf(S.date), fd = parseYmd(first), today = todayStr(), compact = compactOn();
   const lead = (fd.getDay() - WEEK_START + 7) % 7, dim = new Date(fd.getFullYear(), fd.getMonth() + 1, 0).getDate();
@@ -1513,26 +1552,39 @@ function renderMonth() {
   $("#mgrip").textContent = compact ? "⌄ 아래로 밀면 전체 달력" : "⌃ 위로 밀면 요약 + 하루 일정";
   const grid = $("#monthGrid"); grid.textContent = "";
   for (let i = 0; i < 7; i++) { const dw = (WEEK_START + i) % 7; grid.append(h("div", { class: "mh" + (dw === 0 ? " sun" : dw === 6 ? " sat" : "") }, dowLabel(i))); }
+  // 며칠에 걸친 일정: 주(행)마다 가로로 이어지는 바를 만들고, 칸에는 자리(.bsp)만 비워 둠
+  const rowInfo = [];
+  if (!compact) for (let r = 0; r < rows; r++) {
+    const rs = addDays(start, r * 7), re = addDays(rs, 6), seen = new Map();
+    for (let c = 0; c < 7; c++) eventsOn(addDays(rs, c)).forEach((t) => { if (isMulti(t) && !seen.has(t.id)) seen.set(t.id, t); });
+    const segs = [...seen.values()].map((t) => ({ t, sc: Math.max(0, diffDays(rs, t.date)), ec: Math.min(6, diffDays(rs, t.endDate)), s: t.date >= rs, e: t.endDate <= re }))
+      .sort((a, b) => a.sc - b.sc || (b.ec - b.sc) - (a.ec - a.sc) || (a.t.createdAt || 0) - (b.t.createdAt || 0));
+    const laneEnd = []; segs.forEach((g) => { let i = laneEnd.findIndex((x) => x < g.sc); if (i < 0) { i = laneEnd.length; laneEnd.push(0); } g.lane = i; laneEnd[i] = g.ec; });
+    rowInfo.push({ segs, lanes: laneEnd.length });
+  }
+  const cells = [];
   for (let k = 0; k < rows * 7; k++) {
     const d = addDays(start, k), inMonth = d.slice(0, 7) === first.slice(0, 7), dw = parseYmd(d).getDay(), hs = holidaysOf(d);
     const cell = h("div", { class: "mcell" + (inMonth ? "" : " out") + (d === today ? " today" : "") + (compact && d === S.date ? " sel" : ""),
       onclick: () => { if (compact) { S.date = d; renderAll(); } else openDaySheet(d); } },
       h("div", { class: "num " + wdClass(dw, hs) }, parseYmd(d).getDate()));
-    const list = eventsOn(d);
+    const list = eventsOn(d).filter((t) => compact || !isMulti(t)), ri = rowInfo[Math.floor(k / 7)], nl = ri ? ri.lanes : 0;
     if (compact) {
       const bars = list.filter((t) => !isRem(t)), rems = list.filter(isRem);
       bars.slice(0, 3).forEach((t) => cell.append(h("i", { class: "mk " + (kindOf(t) === "timed" ? "t" : "a") + " col-" + (t.color || "c0") })));
       if (rems.length) cell.append(h("div", { class: "mkdots" }, rems.slice(0, 6).map((t) => h("i", { class: "mk r col-" + (t.color || "c0") + (t.done ? " done" : "") }))));
     } else {
+      for (let i = 0; i < nl; i++) cell.append(h("div", { class: "bsp", "data-l": i }));
       hs.forEach((x) => cell.append(h("span", { class: "hol " + (x.l === "ko" ? "kr" : "ca"), title: x.n }, x.n)));
-      const room = MAX - Math.min(hs.length, 1);
+      const room = Math.max(1, MAX - Math.min(hs.length, 1) - nl);
       list.slice(0, room).forEach((t) => cell.append(evChip(t)));
       if (list.length > room) cell.append(h("div", { class: "mmore" }, `+${list.length - room}개`));
     }
     cell.addEventListener("dragover", (e) => { if (S.dragKind === "task") e.preventDefault(); });
     cell.addEventListener("drop", dropOnDate(d));
-    grid.append(cell);
+    grid.append(cell); cells.push(cell);
   }
+  if (!compact) layoutBars(grid, cells, rowInfo);
   if (compact) {
     const dd = parseYmd(S.date), hs = holidaysOf(S.date);
     $("#mdTitle").textContent = `${dd.getMonth() + 1}월 ${dd.getDate()}일 (${DOW[dd.getDay()]})` + (S.date === todayStr() ? " · 오늘" : "");
@@ -2218,7 +2270,9 @@ function renderTrack() {
       h("div", { class: "ring", style: `--p:${st.overall.rate || 0};--rc:${t.color}` }, h("div", { class: "ringin" }, st.overall.rate == null ? "—" : st.overall.rate + "%")),
       h("div", {}, h("div", { class: "tierlabel" }, (t.star ? "★ " : "") + t.label),
         h("div", { class: "sub", style: "font-size:13px;margin-top:4px" }, st.overall.total ? `오늘까지 ${st.overall.total}개 중 ${st.overall.done}개 완료` : "이 주에는 아직 기록할 항목이 없어요"),
-        h("div", { class: "sub", style: "font-size:12px;margin-top:6px" }, "달성률 80점 이상 아주 잘함 · 60~79점 중간 · 30~59점 조금만 더 · 30점 미만 노력 필요")))));
+        h("div", { class: "sub tierguide", style: "font-size:12px;margin-top:8px;line-height:1.7" },
+          h("div", { style: "font-weight:600" }, "달성 기준 (달성률)"),
+          ["80점 이상 ➔ 아주 잘함", "60—79점 ➔ 중간", "30—59점 ➔ 조금만 더", "30점 미만 ➔ 노력 필요"].map((x) => h("div", {}, x)))))));
 
   const bars = h("div", { class: "dbars" });
   st.days.forEach((d, i) => {
